@@ -1,100 +1,94 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using CallBook.Services;
 
 namespace CallBook
 {
     public partial class AllCalls2 : System.Web.UI.Page
     {
-        DataTable dt = new DataTable();
-        protected void Page_Load(object sender, EventArgs e)
+        private DataTable GetData()
         {
-            string caller = Request.QueryString["Caller"];// Convert.ToInt32(Request.QueryString["Caller"]);
-            //caller = "346644";
+            string caller = Request.QueryString["Caller"];
+            //caller = "327657";
             Label1.Visible = true;
             Label1.Text = "Caller number:" + caller;
-            
 
             MyModel context = new MyModel();
             var events = context.T_EVENT.ToList();
             DataTable dt = new DataTable();
-            dt.Columns.Add(new DataColumn("Start Call", typeof(DateTime)));
+            dt.Columns.Add(new DataColumn("StartCall", typeof(DateTime)));
             dt.Columns.Add(new DataColumn("Talk Duration", typeof(int)));
             dt.Columns.Add(new DataColumn("Receiver", typeof(int)));
             dt.Columns.Add(new DataColumn("Type", typeof(string)));
 
-            //303634
-            List<int> allCallIDs = context.T_CALL.Where(record => record.CALLER.ToString().Equals(caller)).Select(callNumber => callNumber.RECORD_ID).ToList<int>();
-            var test = context.T_CALL.FirstOrDefault();
-            
-            List<T_EVENT> allCallEvents = new List<T_EVENT>();
+            IQueryable<int> callers = T_EVENTService.GetCallerCallID(context, caller).OrderByDescending(n => n); ;
+            IQueryable<T_EVENT> callerCalls = T_EVENTService.GetAllCallerCalls(context, caller);
 
-            foreach (int callID in allCallIDs )
+            if (string.IsNullOrEmpty(callers.First().ToString()))
             {
-                allCallEvents.AddRange(context.T_EVENT.Where(tevent => tevent.CALL_ID == callID));
+                return dt;
             }
 
-            foreach (int callID in allCallIDs)
-            {
+            int pageIndex = GridView1.PageIndex;
+            int pageSize = GridView1.PageSize;
 
-                DateTime callStartTime = allCallEvents.Where(recStart => recStart.CALL_ID.Equals(callID) && recStart.RECORD_EVENT_ID.ToLower().Contains("pick")).Select(startTime => startTime.RECORD_DATE).FirstOrDefault();
-                DateTime callEndTime = allCallEvents.Where(recStart => recStart.CALL_ID.Equals(callID)).Select(endTime => endTime.RECORD_DATE).LastOrDefault();
+            int start = pageIndex * pageSize;
+            int end = (pageIndex + 1) * pageSize;
+            if (end > callers.Count())
+            {
+                end = callers.Count();
+            }
+
+            for (int i = start; i < end; i++)
+            {
+                int callID = callers.Skip(i).First();
+                DateTime callStartTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID, "pick").Select(startTime => startTime.RECORD_DATE).FirstOrDefault();
+                DateTime callEndTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID).Select(endTime => endTime.RECORD_DATE).ToList().LastOrDefault();
                 TimeSpan durationTime = callEndTime.Subtract(callStartTime);
-                int receiver = context.T_CALL.Where(record => record.RECORD_ID.Equals(callID)).Select(receiverNumber => receiverNumber.RECIEVER).FirstOrDefault();
-                string eventName = allCallEvents.Where(recStart => recStart.CALL_ID.Equals(callID)).Select(endTime => endTime.RECORD_EVENT_ID).LastOrDefault();
+                IQueryable<int> receiverQuery = T_CALLService.ReceiverByCallID(context, callID).Select(receiverNumber => (receiverNumber.RECIEVER));
+                int? receiver = receiverQuery.Cast<int?>().FirstOrDefault();
+                string eventName = T_EVENTService.ParticipantsByCallID(callerCalls, callID).Select(endTime => endTime.RECORD_EVENT_ID).ToList().LastOrDefault();
 
-                dt.Rows.Add(callStartTime, durationTime.TotalSeconds, receiver, eventName);
-
+                dt.Rows.Add(callStartTime, durationTime.TotalMinutes, receiver, eventName);
             }
 
+            GridView1.VirtualItemCount = callers.Count();
+            return dt;
 
+        }
 
-
-
-            //var allNumberCalls = context.T_EVENT.Where(callnumber => callnumber.CALL_ID.Equals(149)).ToList();
-
-
-
-            //foreach (var item in allNumberCalls)
-            //{
-            //    dt.Rows.Add(item.RECORD_DATE.Date,0,0,"");
-
-            //}
-
-            //foreach (var item in allnumbercalls)
-            //{
-
-
-            //}
-
-            //dt=context.T_EVENT.
-
+        private void BindData()
+        {
+            DataTable dt = GetData();
+            DataView view = dt.DefaultView;
+            view.Sort = "StartCall desc, Talk Duration asc";
             Session["AllCallsTable"] = dt;
 
             GridView1.DataSource = Session["AllCallsTable"]; ;
             GridView1.DataBind();
-
-            //GridView1.DataSource = dt;
-            //GridView1.DataBind();
+        }
 
 
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            Page.Title = "CALLER#" + Request.QueryString["Caller"];
 
+            if (!IsPostBack)
+            {
+                BindData();
+            }
         }
 
 
         protected void GridView1_Sorting(object sender, GridViewSortEventArgs e)
         {
-
-            //Retrieve the table from the session object.
             DataTable dtSort = Session["AllCallsTable"] as DataTable;
 
             if (dtSort != null)
             {
-
                 //Sort the data.
                 dtSort.DefaultView.Sort = e.SortExpression + " " + GetSortDirection(e.SortExpression);
                 GridView1.DataSource = Session["AllCallsTable"];
@@ -133,8 +127,11 @@ namespace CallBook
             return sortDirection;
         }
 
+        protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            GridView1.PageIndex = e.NewPageIndex;
+            BindData();
 
-
-
+        }
     }
 }

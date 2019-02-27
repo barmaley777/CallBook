@@ -10,7 +10,7 @@
 namespace CallBook {
     
     
-    public partial class Default4 {
+    public partial class Default {
         
         /// <summary>
         /// form1 control.

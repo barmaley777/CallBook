@@ -1,7 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CurrentCall2.aspx.cs" Inherits="CallBook.CurrentCall2" %>
 
 <!DOCTYPE html>
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title></title>
@@ -20,7 +19,7 @@
                         <ItemStyle HorizontalAlign="Center" />
                     </asp:BoundField>
                     <asp:BoundField DataField="RECORD_DATE" HeaderText="DATE" DataFormatString="{0:dd/MM/yyyy HH:mm:ss}">
-                        <ItemStyle HorizontalAlign="Center"/>
+                        <ItemStyle HorizontalAlign="Center" />
                     </asp:BoundField>
                 </Columns>
             </asp:GridView>
