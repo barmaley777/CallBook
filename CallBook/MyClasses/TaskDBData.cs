@@ -93,7 +93,7 @@ namespace CallBook.MyClasses
                         currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
                         String eventType = eventTypes[j].EVENT_ID;
                         T_EVENT_TYPE eventTypeRec = context.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
-                        if (j == 4)
+                        if (j == 3)
                         {
                             context.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(random.Next(1, 30)), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
                         }
