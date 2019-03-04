@@ -50,61 +50,38 @@ namespace CallBook.MyClasses
                 int cancelCallCount = Convert.ToInt32(Math.Round(num, MidpointRounding.AwayFromZero));
                 int nonDialledCallCount = callsCount - fullCallCount - cancelCallCount;
 
-                for (int i = 0; i < nonDialledCallCount; i++)
-                {
-                    T_CALL newCall = context.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber() });
-                    context.SaveChanges();
-
-                    for (int j = 0; j < 1; j++)
-                    {
-                        DateTime currentTime = DateTime.Now;
-                        currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
-                        String eventType = eventTypes[j].EVENT_ID;
-                        T_EVENT_TYPE eventTypeRec = context.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
-                        context.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(j), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
-                    }
-                    context.SaveChanges();
-                }
-
-                for (int i = 0; i < cancelCallCount; i++)
-                {
-                    T_CALL newCall = context.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber() });
-                    context.SaveChanges();
-
-                    for (int j = 0; j < 2; j++)
-                    {
-                        DateTime currentTime = DateTime.Now;
-                        currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
-                        String eventType = eventTypes[j].EVENT_ID;
-                        T_EVENT_TYPE eventTypeRec = context.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
-                        context.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(j), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
-                    }
-                    context.SaveChanges();
-                }
-
-                for (int i = 0; i < fullCallCount; i++)
-                {
-                    T_CALL newCall = context.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber(), RECIEVER = PhoneNumber() });
-                    context.SaveChanges();
-
-                    for (int j = 0; j < eventTypes.Count; j++)
-                    {
-                        DateTime currentTime = DateTime.Now;
-                        currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
-                        String eventType = eventTypes[j].EVENT_ID;
-                        T_EVENT_TYPE eventTypeRec = context.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
-                        if (j == 3)
-                        {
-                            context.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(random.Next(1, 30)), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
-                        }
-                        else
-                        {
-                            context.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(j), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
-                        }
-                    }
-                    context.SaveChanges();
-                }
+                RecCallToDB(context, nonDialledCallCount, 1, eventTypes);
+                RecCallToDB(context, cancelCallCount, 2, eventTypes);
+                RecCallToDB(context, fullCallCount, 5, eventTypes);
             }
+        }
+
+        private void RecCallToDB(MyModel db, int recCount, int eventsCount, List<T_EVENT_TYPE> eventTypes) {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+            for (int i = 0; i < recCount; i++)
+            {
+                T_CALL newCall = db.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber(), RECIEVER = PhoneNumber() });
+                db.SaveChanges();
+
+                for (int j = 0; j < eventsCount; j++)
+                {
+                    DateTime currentTime = DateTime.Now;
+                    currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
+                    //String eventType = eventTypes[j].EVENT_ID;
+                    String eventType = eventTypes.Select(x => x.EVENT_ID).ToList<String>()[j];
+                    T_EVENT_TYPE eventTypeRec = db.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
+                    if (j == 3)
+                    {
+                        db.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(random.Next(1, 30)), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
+                    }
+                    else
+                    {
+                        db.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(j), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
+                    }
+                }
+                db.SaveChanges();
+            }
+
         }
     }
 }
