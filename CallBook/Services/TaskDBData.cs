@@ -5,9 +5,6 @@ using System.Linq;
 namespace CallBook.MyClasses
 {
 
-
-
-
     public class TaskDBData
     {
         private static int PhoneNumber()
@@ -47,44 +44,67 @@ namespace CallBook.MyClasses
                 context.SaveChanges();
             }
 
-            if (context.T_EVENT.Count() < 1)
+            if (!context.T_EVENT.Any())
             {
-                double num = (Convert.ToDouble(callsCount) * 80) / 100;
+                double num = (Convert.ToDouble(callsCount) * fullCallCountPercent) / 100;
                 int fullCallCount = Convert.ToInt32(Math.Round(num, MidpointRounding.AwayFromZero));
-                num = (Convert.ToDouble(callsCount) * 15) / 100;
+                num = (Convert.ToDouble(callsCount) * cancelCallCountPercent) / 100;
                 int cancelCallCount = Convert.ToInt32(Math.Round(num, MidpointRounding.AwayFromZero));
                 int nonDialledCallCount = callsCount - fullCallCount - cancelCallCount;
 
-                RecCallToDB(context, nonDialledCallCount, 1, eventTypes);
-                RecCallToDB(context, cancelCallCount, 2, eventTypes);
-                RecCallToDB(context, fullCallCount, 5, eventTypes);
+                RecordCallToDB(context, nonDialledCallCount, 1, eventTypes);
+                RecordCallToDB(context, cancelCallCount, 2, eventTypes);
+                RecordCallToDB(context, fullCallCount, 4, eventTypes);
             }
         }
 
-        private static void RecCallToDB(MyModel db, int recCount, int eventsCount, List<T_EVENT_TYPE> eventTypes) {
+        private static void RecordCallToDB(MyModel db, int recCount, int eventsCount, List<T_EVENT_TYPE> eventTypes)
+        {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             for (int i = 0; i < recCount; i++)
             {
-                T_CALL newCall = db.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber(), RECIEVER = PhoneNumber() });
-
-                for (int j = 0; j < eventsCount; j++)
+                T_CALL newCall = null;
+                //only event EVENT_PICK_UP is missing receiver number, other events have it
+                if (eventsCount == 1)
                 {
-                    DateTime currentTime = DateTime.Now;
+                    newCall = db.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber() });
+                }
+                else
+                {
+                    newCall = db.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber(), RECIEVER = PhoneNumber() });
+                }
+
+                DateTime currentTime = DateTime.Now;
+                for (int j = 0; j <= eventsCount; j++)
+                {                  
                     currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
-                    String eventType = eventTypes.Select(x => x.EVENT_ID).ToList<String>()[j];
-                    T_EVENT_TYPE eventTypeRec = db.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
-                    if (j == 3)
+                    string eventType = string.Empty;
+                    //if index is last of events, that's means it's EVENT_HANG_UP
+                    if (j == eventsCount)
                     {
-                        db.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(random.Next(1, 30)), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
+                        eventType = eventTypes.Select(x => x.EVENT_ID).ToList()[4];
                     }
                     else
                     {
-                        db.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime.AddMinutes(j), CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
+                        eventType = eventTypes.Select(x => x.EVENT_ID).ToList()[j];
                     }
-                }
-                db.SaveChanges();
-            }
 
+                    T_EVENT_TYPE eventTypeRec = db.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
+                    //add some random time to EVENT_CALL_END(index = 3 in eventTypes)
+                    if (j == 3)
+                    {
+                        currentTime = currentTime.AddMinutes(random.Next(1, 30));
+                    }
+                    else
+                    {
+                        currentTime = currentTime.AddMinutes(random.Next(0, j));
+                    }
+
+                    db.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime, CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
+                }
+               
+            }
+            db.SaveChanges();
         }
     }
 }

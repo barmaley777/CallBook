@@ -23,8 +23,8 @@ namespace CallBook
             dt.Columns.Add(new DataColumn("Receiver", typeof(int)));
             dt.Columns.Add(new DataColumn("Type", typeof(string)));
 
-            IQueryable<int> callers = T_EVENTService.GetCallerCallID(context, caller).OrderByDescending(n => n);
-            IQueryable<T_EVENT> callerCalls = T_EVENTService.GetAllCallerCalls(context, caller);
+            IQueryable<int> callers = T_EVENTService.GetCallerCallID(context, int.Parse(caller)).OrderByDescending(n => n);
+            IQueryable<T_EVENT> callerCalls = T_EVENTService.GetAllCallerCalls(context, int.Parse(caller));
 
             if (!callers.Any())
             {
@@ -41,12 +41,12 @@ namespace CallBook
             for (int i = start; i < end; i++)
             {
                 int callID = callers.Skip(i).First();
-                DateTime callStartTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID, "pick").Select(startTime => startTime.RECORD_DATE).FirstOrDefault();
-                DateTime callEndTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID).Select(endTime => endTime.RECORD_DATE).ToList().LastOrDefault();
+                DateTime callStartTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID, "pick").RECORD_DATE;
+                DateTime callEndTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID, "hang").RECORD_DATE;
                 TimeSpan durationTime = callEndTime.Subtract(callStartTime);
                 IQueryable<int> receiverQuery = T_CALLService.ReceiverByCallID(context, callID).Select(receiverNumber => (receiverNumber.RECIEVER));
                 int? receiver = receiverQuery.Cast<int?>().FirstOrDefault();
-                string eventName = T_EVENTService.ParticipantsByCallID(callerCalls, callID).Select(endTime => endTime.RECORD_EVENT_ID).ToList().LastOrDefault();
+                string eventName = T_EVENTService.ParticipantsByCallID(callerCalls, callID).RECORD_EVENT_ID;
 
                 dt.Rows.Add(callStartTime, durationTime.TotalMinutes, receiver, eventName);
             }

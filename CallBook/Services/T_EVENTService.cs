@@ -5,30 +5,30 @@ namespace CallBook.Services
 {
     public static class T_EVENTService
     {
-        public static IQueryable<T_EVENT> GetEventById(MyModel db, string eventId)
+        public static IQueryable<T_EVENT> GetEventByCallId(MyModel db, int eventId)
         {
-            return db.T_EVENT.Where(item => item.T_CALL.RECORD_ID == int.Parse(eventId));
+            return db.T_EVENT.Where(item => item.T_CALL.RECORD_ID == eventId);
         }
 
-        public static IQueryable<int> GetCallerCallID(MyModel db, string caller)
+        public static IQueryable<int> GetCallerCallID(MyModel db, int caller)
         {
-            return db.T_CALL.Where(record => record.CALLER == int.Parse(caller)).Select(n => n.RECORD_ID).Distinct();
+            return db.T_CALL.Where(record => record.CALLER == caller).Select(n => n.RECORD_ID).Distinct();
         }
 
-        public static IQueryable<T_EVENT> GetAllCallerCalls(MyModel db, string caller)
+        public static IQueryable<T_EVENT> GetAllCallerCalls(MyModel db, int caller)
         {
             IQueryable<int> callsID = GetCallerCallID(db, caller);
-            return db.T_EVENT.Where(n => db.T_CALL.Where(t => t.CALLER == int.Parse(caller)).Select(k => k.RECORD_ID).Contains(n.CALL_ID));
+            return db.T_EVENT.Where(n => db.T_CALL.Where(t => t.CALLER == caller).Select(k => k.RECORD_ID).Contains(n.CALL_ID));
         }
 
-        public static IQueryable<T_EVENT> ParticipantsByCallID(IQueryable<T_EVENT> tEvent, int callID)
+        public static T_EVENT ParticipantsByCallID(IQueryable<T_EVENT> tEvent, int callID)
         {
-            return tEvent.Where(recStart => recStart.CALL_ID.Equals(callID));
+            return tEvent.Where(recStart => recStart.CALL_ID.Equals(callID)).FirstOrDefault();
         }
 
-        public static IQueryable<T_EVENT> ParticipantsByCallID(IQueryable<T_EVENT> tEvent, int callID, string eventName)
+        public static T_EVENT ParticipantsByCallID(IQueryable<T_EVENT> tEvent, int callID, string eventName)
         {
-            return tEvent.Where(recStart => recStart.CALL_ID == callID && recStart.RECORD_EVENT_ID.ToLower().Contains(eventName));
+            return tEvent.Where(recStart => recStart.CALL_ID == callID && recStart.RECORD_EVENT_ID.ToLower().Contains(eventName)).FirstOrDefault();
         }
 
         public static IQueryable<T_EVENT> EventsByFilters(MyModel db, string filterCaller, string filterReceiver)
