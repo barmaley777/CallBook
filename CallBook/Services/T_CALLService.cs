@@ -6,7 +6,7 @@ namespace CallBook.Services
     {
         public static IQueryable<T_CALL> ReceiverByCallID(MyModel db, int callID)
         {
-            return db.T_CALL.Where(record => record.RECORD_ID.Equals(callID));
+            return db.T_CALL.Where(record => record.RECORD_ID == callID);
         }
     }
 }

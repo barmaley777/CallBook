@@ -7,36 +7,32 @@ using CallBook.Services;
 
 namespace CallBook
 {
-    public partial class AllCalls2 : System.Web.UI.Page
+    public partial class AllCalls : System.Web.UI.Page
     {
         private DataTable GetData()
         {
             string caller = Request.QueryString["Caller"];
-            //caller = "327657";
             Label1.Visible = true;
             Label1.Text = "Caller number:" + caller;
 
             MyModel context = new MyModel();
-            var events = context.T_EVENT.ToList();
+
             DataTable dt = new DataTable();
             dt.Columns.Add(new DataColumn("StartCall", typeof(DateTime)));
             dt.Columns.Add(new DataColumn("Talk Duration", typeof(int)));
             dt.Columns.Add(new DataColumn("Receiver", typeof(int)));
             dt.Columns.Add(new DataColumn("Type", typeof(string)));
 
-            IQueryable<int> callers = T_EVENTService.GetCallerCallID(context, caller).OrderByDescending(n => n); ;
+            IQueryable<int> callers = T_EVENTService.GetCallerCallID(context, caller).OrderByDescending(n => n);
             IQueryable<T_EVENT> callerCalls = T_EVENTService.GetAllCallerCalls(context, caller);
 
-            if (string.IsNullOrEmpty(callers.First().ToString()))
+            if (!callers.Any())
             {
                 return dt;
             }
 
-            int pageIndex = GridView1.PageIndex;
-            int pageSize = GridView1.PageSize;
-
-            int start = pageIndex * pageSize;
-            int end = (pageIndex + 1) * pageSize;
+            int start = GridView1.PageIndex * GridView1.PageSize;
+            int end = (GridView1.PageIndex + 1) * GridView1.PageSize;
             if (end > callers.Count())
             {
                 end = callers.Count();
@@ -94,7 +90,6 @@ namespace CallBook
                 GridView1.DataSource = Session["AllCallsTable"];
                 GridView1.DataBind();
             }
-
         }
 
         private string GetSortDirection(string column)

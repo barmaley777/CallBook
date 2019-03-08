@@ -33,6 +33,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -145,13 +146,13 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AllCalls2.aspx" />
+    <Content Include="AllCalls.aspx" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\img\CallBookIco.png" />
     <Content Include="Content\img\CallBookLogo.png" />
     <Content Include="Content\Site.css" />
-    <Content Include="CurrentCall2.aspx" />
+    <Content Include="CurrentCall.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -212,21 +213,21 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllCalls2.aspx.cs">
-      <DependentUpon>AllCalls2.aspx</DependentUpon>
+    <Compile Include="AllCalls.aspx.cs">
+      <DependentUpon>AllCalls.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="AllCalls2.aspx.designer.cs">
-      <DependentUpon>AllCalls2.aspx</DependentUpon>
+    <Compile Include="AllCalls.aspx.designer.cs">
+      <DependentUpon>AllCalls.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="CurrentCall2.aspx.cs">
-      <DependentUpon>CurrentCall2.aspx</DependentUpon>
+    <Compile Include="CurrentCall.aspx.cs">
+      <DependentUpon>CurrentCall.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="CurrentCall2.aspx.designer.cs">
-      <DependentUpon>CurrentCall2.aspx</DependentUpon>
+    <Compile Include="CurrentCall.aspx.designer.cs">
+      <DependentUpon>CurrentCall.aspx</DependentUpon>
     </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
@@ -238,14 +239,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\callBookDBContext.cs" />
-    <Compile Include="Models\Mapping\T_CALLMap.cs" />
-    <Compile Include="Models\Mapping\T_EVENTMap.cs" />
-    <Compile Include="Models\Mapping\T_EVENT_TYPEMap.cs" />
-    <Compile Include="Models\T_CALL.cs" />
-    <Compile Include="Models\T_EVENT.cs" />
-    <Compile Include="Models\T_EVENT_TYPE.cs" />
-    <Compile Include="MyClasses\TaskDBData.cs" />
+    <Compile Include="Services\TaskDBData.cs" />
     <Compile Include="MyModel.cs" />
     <Compile Include="MyModel.Views.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

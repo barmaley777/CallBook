@@ -10,7 +10,7 @@
 namespace CallBook {
     
     
-    public partial class AllCalls2 {
+    public partial class AllCalls {
         
         /// <summary>
         /// form1 control.

@@ -6,16 +6,16 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using CallBook.MyClasses;
+using CallBook.Services;
 
 namespace CallBook
 {
     public partial class Default : System.Web.UI.Page
     {
-        
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            TaskDBData dbData = new TaskDBData();
-            dbData.GenerateDBData(15);
+            TaskDBData.GenerateDBData(15);
 
             if (!IsPostBack)
             {
@@ -50,7 +50,7 @@ namespace CallBook
         {
             MyModel context = new MyModel();
 
-            GridView1.PageSize = Int32.Parse(DropDownList2.SelectedValue);
+            GridView1.PageSize = int.Parse(DropDownList2.SelectedValue);
             IQueryable<T_EVENT> events = null;
 
             string filterCaller = TextBox1.Text.Trim();
@@ -60,14 +60,11 @@ namespace CallBook
             //filters
             if (string.IsNullOrEmpty(filterType))
             {
-                events = context.T_EVENT.Where(item => item.T_CALL.CALLER.ToString().Contains(filterCaller))
-                .Where(item => item.T_CALL.RECIEVER.ToString().Contains(filterReceiver));
+                events = T_EVENTService.EventsByFilters(context, filterCaller, filterReceiver);
             }
             else
             {
-                events = context.T_EVENT.Where(item => item.T_CALL.CALLER.ToString().Contains(filterCaller))
-                .Where(item => item.T_EVENT_TYPE.EVENT_NAME.Equals(filterType))
-                .Where(item => item.T_CALL.RECIEVER.ToString().Contains(filterReceiver));
+                events = T_EVENTService.EventsByFilters(context, filterCaller, filterReceiver, filterType);
             }
 
             //sorting
@@ -107,18 +104,12 @@ namespace CallBook
             return events;
         }
 
-        private void BindData() {
-            IQueryable <T_EVENT> events = GetData();
-            GridView1.DataSource = events.Skip(GridView1.PageIndex * GridView1.PageSize).Take(GridView1.PageSize).ToList();
+        private void BindData()
+        {
+            IQueryable<T_EVENT> events = GetData();
+            GridView1.DataSource = GetData().Skip(GridView1.PageIndex * GridView1.PageSize).Take(GridView1.PageSize).ToList();
             GridView1.VirtualItemCount = events.Count();
             GridView1.DataBind();
-        }
-
-
-
-        protected void GridView1_PageIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -132,20 +123,13 @@ namespace CallBook
             GridView gv = sender as GridView;
             ViewState["sortexpression"] = e.SortExpression;
 
-            if (ViewState["sortdirection"] == null)
+            if (ViewState["sortdirection"] == null || ViewState["sortdirection"].ToString() == "Ascending")
             {
-                ViewState["sortdirection"] = SortDirection.Ascending;
+                ViewState["sortdirection"] = SortDirection.Descending;
             }
             else
             {
-                if (ViewState["sortdirection"].ToString() == "Ascending")
-                {
-                    ViewState["sortdirection"] = SortDirection.Descending;
-                }
-                else
-                {
-                    ViewState["sortdirection"] = SortDirection.Ascending;
-                }
+                ViewState["sortdirection"] = SortDirection.Ascending;
             }
 
             string a = ViewState["sortdirection"].ToString();
@@ -160,17 +144,11 @@ namespace CallBook
             StreamWriter sw = new StreamWriter(fileName, false);
             int pageIndex = GridView1.PageIndex;
 
-            int recCount = GridView1.Columns.Count;
             for (int i = 0; i < GridView1.Columns.Count - 1; i++)
             {
-                sw.Write(GridView1.Columns[i]);
-                if (i < recCount - 1)
-                {
-                    sw.Write(",");
-                }
+                sw.Write(GridView1.Columns[i] + ",");
             }
             sw.Write(sw.NewLine);
-
 
             for (int n = 0; n < GridView1.PageCount; n++)
             {
@@ -179,24 +157,21 @@ namespace CallBook
 
                 foreach (GridViewRow dr in GridView1.Rows)
                 {
-                    for (int i = 0; i < recCount - 1; i++)
+                    for (int i = 0; i < GridView1.Columns.Count - 1; i++)
                     {
                         string cellValue = dr.Cells[i].Text;
 
-                        if (!Convert.IsDBNull(dr))
+                        if (cellValue == string.Empty)
                         {
-                            if (cellValue == string.Empty)
-                            {
-                                Control ctl = GridView1.Rows[i].Cells[i].FindControl("Caller");
-                                sw.Write(((HyperLink)ctl).Text + ',');
-                            }
-                            else
-                            {
-                                sw.Write(cellValue + ',');
-                            }
+                            Control ctl = GridView1.Rows[i].Cells[i].FindControl("Caller");
+                            sw.Write(((HyperLink)ctl).Text + ',');
                         }
-
+                        else
+                        {
+                            sw.Write(cellValue + ',');
+                        }
                     }
+
                     sw.Write(sw.NewLine);
                 }
             }
@@ -214,12 +189,6 @@ namespace CallBook
 
         protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            var a = e.Row.DataItemIndex;
-            var b = e.Row.DataItem;
-            var c = e.Row.NamingContainer;
-
-            
-
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
                 e.Row.Attributes["onmouseover"] = "this.style.cursor='pointer'; this.style.fontWeight='bold'; ";
@@ -227,11 +196,6 @@ namespace CallBook
                 e.Row.Attributes["onclick"] = this.Page.ClientScript.GetPostBackClientHyperlink(this.GridView1, "Select$" + e.Row.RowIndex, true);
                 e.Row.Cells[0].Attributes.Clear();
             }
-        }
-
-        protected void GridView1_SelectedIndexChanging(object sender, GridViewSelectEventArgs e)
-        {
-
         }
 
         protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -247,7 +211,7 @@ namespace CallBook
 
                     for (int i = 1; i < row.Cells.Count; i++)
                     {
-                        row.Cells[i].Attributes["onclick"] = string.Format("window.open('CurrentCall2.aspx?Caller={0}&CallID={1}','CurrentCall', 'width=600,height=400');", ((HyperLink)row.FindControl("Caller")).Text, ((Label)row.FindControl("CallID")).Text);
+                        row.Cells[i].Attributes["onclick"] = string.Format("window.open('CurrentCall.aspx?Caller={0}&CallID={1}','CurrentCall', 'width=600,height=400');", ((HyperLink)row.FindControl("Caller")).Text, ((Label)row.FindControl("CallID")).Text);
                     }
                 }
                 else
@@ -258,48 +222,6 @@ namespace CallBook
             }
 
         }
-        protected void OpenAllCalls(Object sender, EventArgs e)
-        {
-            LinkButton btnCall = (LinkButton)sender;
-            string strCall = btnCall.Text;
-            Response.Write(string.Format("window.open('AllCalls2.aspx', 'blank', resizable='yes'); "));
-            Response.Redirect(string.Format("window.open('AllCalls2.aspx', 'blank', resizable='yes'); "));
-        }
 
-
-        protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            if (e.CommandName == "VIEW")
-            {
-                LinkButton lnkView = (LinkButton)e.CommandSource;
-                string dealId = lnkView.CommandArgument;
-
-
-            }
-
-        }
-
-        protected void yourCommand(object sender, CommandEventArgs e)
-        {
-            string myID = e.CommandArgument.ToString();
-        }
-
-        protected void GridView1_RowCreated(object sender, GridViewRowEventArgs e)
-        {
-            if (e.Row.RowType == DataControlRowType.DataRow)
-            {
-
-                LinkButton selectButton = new LinkButton()
-                {
-                    CommandName = "Select",
-                    Text = e.Row.Cells[0].Text
-                };
-
-                e.Row.Attributes["onmouseover"] = "this.style.cursor='pointer'; this.style.fontWeight='bold'; ";
-                e.Row.Attributes["onmouseout"] = "this.style.textDecoration='none',this.style.fontWeight=''; ";
-                e.Row.Attributes["onclick"] = this.Page.ClientScript.GetPostBackClientHyperlink(this.GridView1, "Select$" + e.Row.RowIndex, true);
-
-            }
-        }
     }
 }

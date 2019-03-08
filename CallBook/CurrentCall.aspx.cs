@@ -5,7 +5,7 @@ using System.Web.UI.WebControls;
 
 namespace CallBook
 {
-    public partial class CurrentCall2 : System.Web.UI.Page
+    public partial class CurrentCall : System.Web.UI.Page
     {
 
         protected void Page_Load(object sender, EventArgs e)

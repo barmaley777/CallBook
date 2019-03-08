@@ -4,9 +4,13 @@ using System.Linq;
 
 namespace CallBook.MyClasses
 {
+
+
+
+
     public class TaskDBData
     {
-        private int PhoneNumber()
+        private static int PhoneNumber()
         {
             int phoneNumber = 0;
             Random random = new Random(Guid.NewGuid().GetHashCode());
@@ -22,10 +26,11 @@ namespace CallBook.MyClasses
             return phoneNumber;
         }
 
-        public void GenerateDBData(int callsCount)
+        public static void GenerateDBData(int callsCount)
         {
+            const int cancelCallCountPercent = 15;
+            const int fullCallCountPercent = 80;
             MyModel context = new MyModel();
-            Random random = new Random(Guid.NewGuid().GetHashCode());
 
             List<T_EVENT_TYPE> eventTypes = new List<T_EVENT_TYPE>()
             {
@@ -56,18 +61,16 @@ namespace CallBook.MyClasses
             }
         }
 
-        private void RecCallToDB(MyModel db, int recCount, int eventsCount, List<T_EVENT_TYPE> eventTypes) {
+        private static void RecCallToDB(MyModel db, int recCount, int eventsCount, List<T_EVENT_TYPE> eventTypes) {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             for (int i = 0; i < recCount; i++)
             {
                 T_CALL newCall = db.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber(), RECIEVER = PhoneNumber() });
-                db.SaveChanges();
 
                 for (int j = 0; j < eventsCount; j++)
                 {
                     DateTime currentTime = DateTime.Now;
                     currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
-                    //String eventType = eventTypes[j].EVENT_ID;
                     String eventType = eventTypes.Select(x => x.EVENT_ID).ToList<String>()[j];
                     T_EVENT_TYPE eventTypeRec = db.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
                     if (j == 3)

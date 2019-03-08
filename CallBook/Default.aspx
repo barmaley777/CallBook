@@ -34,18 +34,16 @@
         </div>
         <div>
             <asp:GridView ID="GridView1" runat="server" AllowPaging="true" AllowCustomPaging="true" AllowSorting="true" AutoGenerateColumns="false" PageSize="10"
-                OnPageIndexChanged="GridView1_PageIndexChanged"
                 OnPageIndexChanging="GridView1_PageIndexChanging"
                 OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
                 OnSorting="GridView1_Sorting"
-                OnRowDataBound="GridView1_RowDataBound"
-                OnRowCommand="GridView1_RowCommand" OnSelectedIndexChanging="GridView1_SelectedIndexChanging" OnRowCreated="GridView1_RowCreated">
+                OnRowDataBound="GridView1_RowDataBound">
                 <Columns>
                     <asp:TemplateField HeaderText="Caller" SortExpression="T_CALL.CALLER" ItemStyle-Width="150px" ItemStyle-HorizontalAlign="Center">
                         <ItemTemplate>
                             <asp:HyperLink ID="Caller" runat="server" Target="_blank"
                                 datanavigateurlfields="ID"
-                                NavigateUrl='<%# "AllCalls2.aspx?Caller=" + Eval("T_CALL.CALLER") + "&recordID=" + Eval("T_CALL.RECORD_ID")%>'
+                                NavigateUrl='<%# "AllCalls.aspx?Caller=" + Eval("T_CALL.CALLER") + "&recordID=" + Eval("T_CALL.RECORD_ID")%>'
                                 ValidateRequestMode="Enabled" Enabled="true"
                                 Text='<%# Eval("T_CALL.CALLER") %>'></asp:HyperLink>
                         </ItemTemplate>

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CurrentCall2.aspx.cs" Inherits="CallBook.CurrentCall2" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CurrentCall.aspx.cs" Inherits="CallBook.CurrentCall" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
