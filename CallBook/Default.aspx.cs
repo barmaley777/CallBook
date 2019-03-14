@@ -60,29 +60,30 @@ namespace CallBook
             //filters
             if (string.IsNullOrEmpty(filterType))
             {
-                events = T_EVENTService.EventsByFilters(context, filterCaller, filterReceiver);
+                events = T_EVENTService.GetEventsByFilters(context, filterCaller, filterReceiver);
             }
             else
             {
-                events = T_EVENTService.EventsByFilters(context, filterCaller, filterReceiver, filterType);
+                events = T_EVENTService.GetEventsByFilters(context, filterCaller, filterReceiver, filterType);
             }
 
             //sorting
             if (ViewState["sortexpression"] != null)
             {
+                SortDirection currentDirection = (SortDirection)Enum.Parse(typeof(SortDirection), ViewState["sortdirection"].ToString());
                 switch (ViewState["sortexpression"].ToString().ToUpper())
-                {
+                {                  
                     case "T_CALL.CALLER":
-                        events = ViewState["sortdirection"].Equals(SortDirection.Ascending) ? events.OrderBy(item => item.T_CALL.CALLER) : events.OrderByDescending(item => item.T_CALL.CALLER);
+                        events = (currentDirection == SortDirection.Ascending) ? events.OrderBy(item => item.T_CALL.CALLER) : events.OrderByDescending(item => item.T_CALL.CALLER);
                         break;
                     case "T_EVENT_TYPE.EVENT_NAME":
-                        events = ViewState["sortdirection"].Equals(SortDirection.Ascending) ? events.OrderBy(item => item.T_EVENT_TYPE.EVENT_NAME) : events.OrderByDescending(item => item.T_EVENT_TYPE.EVENT_NAME);
+                        events = (currentDirection == SortDirection.Ascending) ? events.OrderBy(item => item.T_EVENT_TYPE.EVENT_NAME) : events.OrderByDescending(item => item.T_EVENT_TYPE.EVENT_NAME);
                         break;
                     case "T_CALL.RECIEVER":
-                        events = ViewState["sortdirection"].Equals(SortDirection.Ascending) ? events.OrderBy(item => item.T_CALL.RECIEVER) : events.OrderByDescending(item => item.T_CALL.RECIEVER);
+                        events = (currentDirection == SortDirection.Ascending) ? events.OrderBy(item => item.T_CALL.RECIEVER) : events.OrderByDescending(item => item.T_CALL.RECIEVER);
                         break;
                     case "RECORD_DATE":
-                        events = ViewState["sortdirection"].Equals(SortDirection.Ascending) ? events.OrderBy(item => item.RECORD_DATE) : events.OrderByDescending(item => item.RECORD_DATE);
+                        events = (currentDirection == SortDirection.Ascending) ? events.OrderBy(item => item.RECORD_DATE) : events.OrderByDescending(item => item.RECORD_DATE);
                         break;
                     default:
                         events = events.OrderBy(item => item.T_CALL.CALLER);
@@ -107,7 +108,7 @@ namespace CallBook
         private void BindData()
         {
             IQueryable<T_EVENT> events = GetData();
-            GridView1.DataSource = GetData().Skip(GridView1.PageIndex * GridView1.PageSize).Take(GridView1.PageSize).ToList();
+            GridView1.DataSource = events.Skip(GridView1.PageIndex * GridView1.PageSize).Take(GridView1.PageSize).ToList();
             GridView1.VirtualItemCount = events.Count();
             GridView1.DataBind();
         }
@@ -120,7 +121,6 @@ namespace CallBook
 
         protected void GridView1_Sorting(object sender, GridViewSortEventArgs e)
         {
-            GridView gv = sender as GridView;
             ViewState["sortexpression"] = e.SortExpression;
 
             if (ViewState["sortdirection"] == null || ViewState["sortdirection"].ToString() == "Ascending")
@@ -132,16 +132,20 @@ namespace CallBook
                 ViewState["sortdirection"] = SortDirection.Ascending;
             }
 
-            string a = ViewState["sortdirection"].ToString();
-            this.GetData(e.SortExpression);
+            GetData(e.SortExpression);
             BindData();
         }
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            // Create the CSV file to which grid data will be exported.
-            string fileName = "C:\\all_records_" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
-            StreamWriter sw = new StreamWriter(fileName, false);
+            string fileName = "all_records_" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+            Response.Clear();
+            Response.Buffer = true;
+            Response.AppendHeader("Content-Disposition", "attachment; filename=" + fileName + ";");
+            Response.ContentType = "text/csv";
+            Response.Charset = "utf-8";
+            StreamWriter sw = new StreamWriter(Response.OutputStream);
+
             int pageIndex = GridView1.PageIndex;
 
             for (int i = 0; i < GridView1.Columns.Count - 1; i++)
@@ -153,7 +157,7 @@ namespace CallBook
             for (int n = 0; n < GridView1.PageCount; n++)
             {
                 GridView1.PageIndex = n;
-                this.GetData();
+                BindData();
 
                 foreach (GridViewRow dr in GridView1.Rows)
                 {
@@ -163,7 +167,7 @@ namespace CallBook
 
                         if (cellValue == string.Empty)
                         {
-                            Control ctl = GridView1.Rows[i].Cells[i].FindControl("Caller");
+                            Control ctl = dr.Cells[i].FindControl("Caller");
                             sw.Write(((HyperLink)ctl).Text + ',');
                         }
                         else
@@ -176,15 +180,15 @@ namespace CallBook
                 }
             }
             sw.Close();
+            Response.End();
             GridView1.PageIndex = pageIndex;
         }
 
         protected void DropDownList2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            GridView1.PageSize = Int32.Parse(DropDownList2.SelectedValue);
+            GridView1.PageSize = int.Parse(DropDownList2.SelectedValue);
             GridView1.PageIndex = 0;
-
-            this.BindData();
+            BindData();
         }
 
         protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -193,7 +197,7 @@ namespace CallBook
             {
                 e.Row.Attributes["onmouseover"] = "this.style.cursor='pointer'; this.style.fontWeight='bold'; ";
                 e.Row.Attributes["onmouseout"] = "this.style.textDecoration='none',this.style.fontWeight=''; ";
-                e.Row.Attributes["onclick"] = this.Page.ClientScript.GetPostBackClientHyperlink(this.GridView1, "Select$" + e.Row.RowIndex, true);
+                e.Row.Attributes["onclick"] = Page.ClientScript.GetPostBackClientHyperlink(GridView1, "Select$" + e.Row.RowIndex, true);
                 e.Row.Cells[0].Attributes.Clear();
             }
         }
@@ -222,6 +226,5 @@ namespace CallBook
             }
 
         }
-
     }
 }

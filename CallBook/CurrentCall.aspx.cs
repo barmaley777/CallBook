@@ -16,8 +16,7 @@ namespace CallBook
 
             Label1.Text = "Caller: " + caller;
 
-            IQueryable<T_EVENT> events = context.T_EVENT;
-            events = T_EVENTService.GetEventByCallId(context, int.Parse(callID)).OrderBy(item => item.T_CALL.CALLER);
+            IQueryable<T_EVENT> events = T_EVENTService.GetEventsByCallId(context, int.Parse(callID)).OrderBy(item => item.T_CALL.CALLER);
 
             GridView1.DataSource = events.ToList();
             GridView1.DataBind();

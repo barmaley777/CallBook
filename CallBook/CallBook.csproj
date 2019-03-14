@@ -245,6 +245,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\T_CALLService.cs" />
     <Compile Include="Services\T_EVENTService.cs" />
+    <Compile Include="Services\T_EVENT_TYPEService.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

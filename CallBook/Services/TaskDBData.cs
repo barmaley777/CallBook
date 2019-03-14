@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CallBook.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,7 @@ namespace CallBook.MyClasses
 
     public class TaskDBData
     {
-        private static int PhoneNumber()
+        private static int GetPhoneNumber()
         {
             int phoneNumber = 0;
             Random random = new Random(Guid.NewGuid().GetHashCode());
@@ -60,38 +61,42 @@ namespace CallBook.MyClasses
 
         private static void RecordCallToDB(MyModel db, int recCount, int eventsCount, List<T_EVENT_TYPE> eventTypes)
         {
+            MyModel context = new MyModel();
+            const int eventCallEndIndex = 3; //EVENT_CALL_END index from eventTypes list
+            const int totalCallEvents = 1; //caller make only EVENT_PICK_UP
+
             Random random = new Random(Guid.NewGuid().GetHashCode());
             for (int i = 0; i < recCount; i++)
             {
                 T_CALL newCall = null;
                 //only event EVENT_PICK_UP is missing receiver number, other events have it
-                if (eventsCount == 1)
+                if (eventsCount == totalCallEvents)
                 {
-                    newCall = db.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber() });
+                    newCall = db.T_CALL.Add(new T_CALL() { CALLER = GetPhoneNumber() });
                 }
                 else
                 {
-                    newCall = db.T_CALL.Add(new T_CALL() { CALLER = PhoneNumber(), RECIEVER = PhoneNumber() });
+                    newCall = db.T_CALL.Add(new T_CALL() { CALLER = GetPhoneNumber(), RECIEVER = GetPhoneNumber() });
                 }
 
                 DateTime currentTime = DateTime.Now;
                 for (int j = 0; j <= eventsCount; j++)
                 {                  
                     currentTime = currentTime.AddMilliseconds(1000 - currentTime.Millisecond);
-                    string eventType = string.Empty;
+                    string eventTypeID = string.Empty;
                     //if index is last of events, that's means it's EVENT_HANG_UP
                     if (j == eventsCount)
                     {
-                        eventType = eventTypes.Select(x => x.EVENT_ID).ToList()[4];
+                        eventTypeID = eventTypes.Select(x => x.EVENT_ID).Last();
                     }
                     else
                     {
-                        eventType = eventTypes.Select(x => x.EVENT_ID).ToList()[j];
+                        eventTypeID = eventTypes.Select(x => x.EVENT_ID).ToList()[j];
                     }
 
-                    T_EVENT_TYPE eventTypeRec = db.T_EVENT_TYPE.FirstOrDefault(n => n.EVENT_ID == eventType);
+                    T_EVENT_TYPE eventTypeRec = T_EVENT_TYPEService.GetEventTypeByEventID(db,eventTypeID);
                     //add some random time to EVENT_CALL_END(index = 3 in eventTypes)
-                    if (j == 3)
+                    if (j == eventCallEndIndex)
                     {
                         currentTime = currentTime.AddMinutes(random.Next(1, 30));
                     }
@@ -100,7 +105,7 @@ namespace CallBook.MyClasses
                         currentTime = currentTime.AddMinutes(random.Next(0, j));
                     }
 
-                    db.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventType, RECORD_DATE = currentTime, CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
+                    db.T_EVENT.Add(new T_EVENT() { RECORD_EVENT_ID = eventTypeID, RECORD_DATE = currentTime, CALL_ID = newCall.RECORD_ID, T_CALL = newCall, T_EVENT_TYPE = eventTypeRec });
                 }
                
             }

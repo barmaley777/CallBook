@@ -58,33 +58,3 @@ C:\Users\mvorp\Documents\Visual Studio 2015\Projects\CallBook2\CallBook.Tests\bi
 C:\Users\mvorp\Documents\Visual Studio 2015\Projects\CallBook2\CallBook.Tests\obj\Debug\CallBook.Tests.csprojResolveAssemblyReference.cache
 C:\Users\mvorp\Documents\Visual Studio 2015\Projects\CallBook2\CallBook.Tests\obj\Debug\CallBook.Tests.dll
 C:\Users\mvorp\Documents\Visual Studio 2015\Projects\CallBook2\CallBook.Tests\obj\Debug\CallBook.Tests.pdb
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\ApplicationInsights.config
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\csc.exe
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\Microsoft.CodeAnalysis.CSharp.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\Microsoft.CodeAnalysis.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\Microsoft.CSharp.Core.targets
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\Microsoft.VisualBasic.Core.targets
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\System.Collections.Immutable.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\System.Reflection.Metadata.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\vbc.exe
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\VBCSCompiler.exe
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\roslyn\VBCSCompiler.exe.config
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\CallBook.Tests.dll.config
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\CallBook.Tests.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\CallBook.Tests.pdb
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\CallBook.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\EntityFramework.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\System.Web.Optimization.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\Microsoft.AspNet.FriendlyUrls.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\Microsoft.Web.Infrastructure.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\CallBook.pdb
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\EntityFramework.xml
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\System.Web.Optimization.xml
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\bin\Debug\Microsoft.AspNet.FriendlyUrls.xml
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\obj\Debug\CallBook.Tests.csprojResolveAssemblyReference.cache
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\obj\Debug\CallBook.Tests.dll
-C:\Users\mvorp\Documents\GitHub\CallBook\CallBook.Tests\obj\Debug\CallBook.Tests.pdb

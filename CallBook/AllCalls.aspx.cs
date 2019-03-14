@@ -41,12 +41,12 @@ namespace CallBook
             for (int i = start; i < end; i++)
             {
                 int callID = callers.Skip(i).First();
-                DateTime callStartTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID, "pick").RECORD_DATE;
-                DateTime callEndTime = T_EVENTService.ParticipantsByCallID(callerCalls, callID, "hang").RECORD_DATE;
+                DateTime callStartTime = T_EVENTService.GetParticipantsByCallID(callerCalls, callID, "pick").RECORD_DATE;
+                DateTime callEndTime = T_EVENTService.GetParticipantsByCallID(callerCalls, callID, "hang").RECORD_DATE;
                 TimeSpan durationTime = callEndTime.Subtract(callStartTime);
-                IQueryable<int> receiverQuery = T_CALLService.ReceiverByCallID(context, callID).Select(receiverNumber => (receiverNumber.RECIEVER));
+                IQueryable<int> receiverQuery = T_CALLService.GetReceiverByCallID(context, callID).Select(receiverNumber => (receiverNumber.RECIEVER));
                 int? receiver = receiverQuery.Cast<int?>().FirstOrDefault();
-                string eventName = T_EVENTService.ParticipantsByCallID(callerCalls, callID).RECORD_EVENT_ID;
+                string eventName = T_EVENTService.GetParticipantsByCallID(callerCalls, callID).RECORD_EVENT_ID;
 
                 dt.Rows.Add(callStartTime, durationTime.TotalMinutes, receiver, eventName);
             }
